@@ -24,7 +24,7 @@ jobs:
         os: [macos, ubuntu]
         include:
           - os: macos
-            runner: macos-12
+            runner: macos-13
           - os: ubuntu
             runner: ubuntu-latest
 
