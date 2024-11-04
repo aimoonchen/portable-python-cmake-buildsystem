@@ -41,6 +41,7 @@ jobs:
       if: ${{ matrix.os == 'macos' }}
       run: |
         brew install gpatch
+        echo "/usr/local/opt/gpatch/libexec/gnubin" >> $GITHUB_PATH
 
     - name: Build
       run: |
