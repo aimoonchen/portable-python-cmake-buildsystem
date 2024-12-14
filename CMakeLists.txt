@@ -162,6 +162,9 @@ if(UNIX)
 else()
     set(WITH_STATIC_DEPENDENCIES 0)
 endif()
+if(PY_VERSION VERSION_GREATER_EQUAL "3.13")
+    option(WITH_FREE_THREADING "Enable experimental free-threaded build and disables the GIL" OFF)
+endif()
 
 # Detect source directory
 set(_landmark "pyconfig.h.in") # CMake will look for this file.
@@ -335,6 +338,8 @@ set(_download_3.12.5_md5 "d23d56b51d36a9d51b2b13d30c849d00")
 set(_download_3.12.6_md5 "c2f1dd5c8807ee50b778684b7958ee28")
 set(_download_3.12.7_md5 "5d0c0e4c6a022a87165a9addcd869109")
 set(_download_3.12.8_md5 "304473cf367fa65e450edf4b06b55fcc")
+# 3.13.x
+set(_download_3.13.0_md5 "c29f37220520ec6075fc37d4c62e178b")
 
 set(_extracted_dir "Python-${PY_VERSION}")
 
@@ -586,6 +591,14 @@ if(UNIX)
     configure_file(cmake/config-unix/pyconfig.h.in
                    ${PYCONFIG_BUILD_DIR}/pyconfig.h)
 elseif(WIN32)
+    if(PY_VERSION VERSION_GREATER_EQUAL "3.13")
+        file(READ ${SRC_DIR}/PC/pyconfig.h.in PYCONFIG_H_CONTENTS)
+        if(WITH_FREE_THREADING)
+            string(REPLACE "/* #define Py_GIL_DISABLED 1 */" "#define Py_GIL_DISABLED 1" PYCONFIG_H_CONTENTS "${PYCONFIG_H_CONTENTS}")
+        endif()
+        file(WRITE ${SRC_DIR}/PC/pyconfig.h "${PYCONFIG_H_CONTENTS}")
+    endif()
+
     set(PYCONFIG_BUILD_DIR ${SRC_DIR}/PC) # In a windows build tree, 'pyconfig.h' is NOT required to
                                           # live along side the python executable.
                                           # See function '_init_posix()' and '_init_non_posix()'

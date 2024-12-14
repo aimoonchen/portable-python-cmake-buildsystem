@@ -15,8 +15,14 @@ if(Cosmopolitan)
     set(NOT_COSMOPOLITAN 0)
 endif()
 
+if(WITH_FREE_THREADING)
+    add_definitions(-DPy_GIL_DISABLED)
+endif()
+
 add_python_extension(array ${WIN32_BUILTIN} SOURCES arraymodule.c)
-add_python_extension(audioop ${WIN32_BUILTIN} REQUIRES HAVE_LIBM SOURCES audioop.c LIBRARIES ${M_LIBRARIES})
+if(PY_VERSION VERSION_LESS "3.13")
+    add_python_extension(audioop ${WIN32_BUILTIN} REQUIRES HAVE_LIBM SOURCES audioop.c LIBRARIES ${M_LIBRARIES})
+endif()
 add_python_extension(_bisect ${WIN32_BUILTIN} SOURCES _bisectmodule.c)
 add_python_extension(cmath REQUIRES HAVE_LIBM ${WIN32_BUILTIN} SOURCES $<$<VERSION_LESS:${PY_VERSION},3.11>:_math.c> cmathmodule.c LIBRARIES ${M_LIBRARIES})
 add_python_extension(_codecs_cn ${WIN32_BUILTIN} SOURCES cjkcodecs/_codecs_cn.c)
@@ -27,11 +33,13 @@ add_python_extension(_codecs_kr ${WIN32_BUILTIN} SOURCES cjkcodecs/_codecs_kr.c)
 add_python_extension(_codecs_tw ${WIN32_BUILTIN} SOURCES cjkcodecs/_codecs_tw.c)
 add_python_extension(_collections ${WIN32_BUILTIN} ${PY3_BUILTIN} SOURCES _collectionsmodule.c) # Container types
 add_python_extension(cPickle ${WIN32_BUILTIN} REQUIRES IS_PY2 SOURCES cPickle.c)
-set(crypt2_NAME crypt)
-set(crypt2_SOURCES cryptmodule.c)
-set(crypt3_NAME _crypt)
-set(crypt3_SOURCES _cryptmodule.c)
-add_python_extension(${crypt${PY_VERSION_MAJOR}_NAME} REQUIRES HAVE_LIBCRYPT SOURCES ${crypt${PY_VERSION_MAJOR}_SOURCES} LIBRARIES ${HAVE_LIBCRYPT})
+if(PY_VERSION VERSION_LESS "3.13")
+    set(crypt2_NAME crypt)
+    set(crypt2_SOURCES cryptmodule.c)
+    set(crypt3_NAME _crypt)
+    set(crypt3_SOURCES _cryptmodule.c)
+    add_python_extension(${crypt${PY_VERSION_MAJOR}_NAME} REQUIRES HAVE_LIBCRYPT SOURCES ${crypt${PY_VERSION_MAJOR}_SOURCES} LIBRARIES ${HAVE_LIBCRYPT})
+endif()
 add_python_extension(cStringIO ${WIN32_BUILTIN} REQUIRES IS_PY2 SOURCES cStringIO.c)
 add_python_extension(_csv ${WIN32_BUILTIN} SOURCES _csv.c)
 add_python_extension(_ctypes_test NEVER_BUILTIN REQUIRES HAVE_LIBM SOURCES _ctypes/_ctypes_test.c LIBRARIES ${M_LIBRARIES})
@@ -85,40 +93,51 @@ add_python_extension(strop ${WIN32_BUILTIN} REQUIRES IS_PY2 SOURCES stropmodule.
 add_python_extension(_struct ${WIN32_BUILTIN} SOURCES _struct.c)
 set(testcapi_SOURCES _testcapimodule.c)
 if(PY_VERSION VERSION_GREATER_EQUAL "3.12")
-  list(APPEND testcapi_SOURCES
-    _testcapi/abstract.c
-    _testcapi/buffer.c
-    _testcapi/bytearray.c
-    _testcapi/bytes.c
-    _testcapi/code.c
-    _testcapi/codec.c
-    _testcapi/complex.c
-    _testcapi/datetime.c
-    _testcapi/dict.c
-    _testcapi/docstring.c
-    _testcapi/exceptions.c
-    _testcapi/file.c
-    _testcapi/float.c
-    _testcapi/gc.c
-    _testcapi/getargs.c
-    _testcapi/heaptype.c
-    _testcapi/heaptype_relative.c
-    _testcapi/immortal.c
-    _testcapi/list.c
-    _testcapi/long.c
-    _testcapi/mem.c
-    _testcapi/numbers.c
-    _testcapi/pyos.c
-    _testcapi/pytime.c
-    _testcapi/set.c
-    _testcapi/structmember.c
-    _testcapi/sys.c
-    _testcapi/tuple.c
-    _testcapi/unicode.c
-    _testcapi/vectorcall.c
-    _testcapi/vectorcall_limited.c
-    _testcapi/watchers.c
-  )
+    if(PY_VERSION VERSION_LESS "3.13")
+        list(APPEND testcapi_SOURCES
+            _testcapi/bytearray.c
+            _testcapi/heaptype_relative.c
+            _testcapi/pyos.c
+            _testcapi/pytime.c
+            _testcapi/sys.c
+            _testcapi/vectorcall_limited.c
+        )
+    else()
+        list(APPEND testcapi_SOURCES
+            _testcapi/hash.c
+            _testcapi/pyatomic.c
+            _testcapi/run.c
+            _testcapi/time.c
+        )
+    endif()
+    list(APPEND testcapi_SOURCES
+        _testcapi/abstract.c
+        _testcapi/buffer.c
+        _testcapi/bytes.c
+        _testcapi/code.c
+        _testcapi/codec.c
+        _testcapi/complex.c
+        _testcapi/datetime.c
+        _testcapi/dict.c
+        _testcapi/docstring.c
+        _testcapi/exceptions.c
+        _testcapi/file.c
+        _testcapi/float.c
+        _testcapi/gc.c
+        _testcapi/getargs.c
+        _testcapi/heaptype.c
+        _testcapi/immortal.c
+        _testcapi/list.c
+        _testcapi/long.c
+        _testcapi/mem.c
+        _testcapi/numbers.c
+        _testcapi/set.c
+        _testcapi/structmember.c
+        _testcapi/tuple.c
+        _testcapi/unicode.c
+        _testcapi/vectorcall.c
+        _testcapi/watchers.c
+    )
 endif()
 if(PY_VERSION VERSION_LESS "3.12" OR UNIX)
     # This module seems to build incorrectly for Python 3.12 Windows
@@ -208,7 +227,16 @@ endif()
 
 # Python 3.8
 if(PY_VERSION VERSION_GREATER_EQUAL "3.8")
-    add_python_extension(_testinternalcapi SOURCES _testinternalcapi.c DEFINITIONS "PY3_DLLNAME=\"python3$<$<CONFIG:Debug>:_d>\"")
+    set(_testinternalcapi_SOURCES _testinternalcapi.c)
+    if(PY_VERSION VERSION_GREATER_EQUAL "3.13")
+        list(APPEND _testinternalcapi_SOURCES
+            _testinternalcapi/pytime.c
+            _testinternalcapi/set.c
+            _testinternalcapi/test_lock.c
+            _testinternalcapi/test_critical_sections.c
+        )
+    endif()
+    add_python_extension(_testinternalcapi SOURCES ${_testinternalcapi_SOURCES} DEFINITIONS "PY3_DLLNAME=\"python3$<$<CONFIG:Debug>:_d>\"")
 endif()
 
 # Python 3.9
@@ -237,17 +265,21 @@ if(TIRPC_LIBRARY AND TIRPC_RPC_INCLUDE_PATH)
         list(APPEND nis_LIBRARIES ${TIRPC_STATIC_LIBRARIES})
     endif()
 endif()
-add_python_extension(nis
-    REQUIRES ${nis_REQUIRES}
-    SOURCES nismodule.c
-    LIBRARIES ${nis_LIBRARIES}
-    INCLUDEDIRS ${nis_INCLUDEDIRS}
-)
+if(PY_VERSION VERSION_LESS "3.13")
+    add_python_extension(nis
+        REQUIRES ${nis_REQUIRES}
+        SOURCES nismodule.c
+        LIBRARIES ${nis_LIBRARIES}
+        INCLUDEDIRS ${nis_INCLUDEDIRS}
+    )
+endif()
 
 add_python_extension(posix REQUIRES UNIX ALWAYS_BUILTIN SOURCES posixmodule.c DEFINITIONS Py_BUILD_CORE)
 add_python_extension(pwd REQUIRES UNIX BUILTIN SOURCES pwdmodule.c) # this is needed to find out the user's home dir if $HOME is not set
 add_python_extension(resource REQUIRES UNIX SOURCES resource.c)
-add_python_extension(spwd REQUIRES UNIX HAVE_GETSPNAM HAVE_GETSPENT SOURCES spwdmodule.c)
+if(PY_VERSION VERSION_LESS "3.13")
+    add_python_extension(spwd REQUIRES UNIX HAVE_GETSPNAM HAVE_GETSPENT SOURCES spwdmodule.c)
+endif()
 add_python_extension(syslog REQUIRES UNIX SOURCES syslogmodule.c)
 add_python_extension(termios REQUIRES UNIX SOURCES termios.c)
 
@@ -266,7 +298,9 @@ add_python_extension(_scproxy
 
 # Linux-only extensions
 add_python_extension(linuxaudiodev REQUIRES LINUX IS_PY2 NOT_COSMOPOLITAN SOURCES linuxaudiodev.c)
-add_python_extension(ossaudiodev REQUIRES LINUX NOT_COSMOPOLITAN SOURCES ossaudiodev.c)
+if(PY_VERSION VERSION_LESS "3.13")
+    add_python_extension(ossaudiodev REQUIRES LINUX NOT_COSMOPOLITAN SOURCES ossaudiodev.c)
+endif()
 
 # Python 3.8: UNIX-only extensions
 if(PY_VERSION VERSION_GREATER_EQUAL "3.8")
@@ -278,11 +312,13 @@ if(PY_VERSION VERSION_GREATER_EQUAL "3.8")
 endif()
 
 # Windows-only extensions
-add_python_extension(_msi
-    REQUIRES WIN32
-    SOURCES ${SRC_DIR}/PC/_msi.c
-    LIBRARIES cabinet.lib msi.lib rpcrt4.lib
-)
+if(PY_VERSION VERSION_LESS "3.13")
+    add_python_extension(_msi
+        REQUIRES WIN32
+        SOURCES ${SRC_DIR}/PC/_msi.c
+        LIBRARIES cabinet.lib msi.lib rpcrt4.lib
+    )
+endif()
 add_python_extension(msvcrt REQUIRES MSVC BUILTIN SOURCES ${SRC_DIR}/PC/msvcrtmodule.c)
 add_python_extension(nt REQUIRES WIN32 ALWAYS_BUILTIN SOURCES posixmodule.c)
 add_python_extension(_subprocess REQUIRES WIN32 IS_PY2 BUILTIN SOURCES ${SRC_DIR}/PC/_subprocess.c)
