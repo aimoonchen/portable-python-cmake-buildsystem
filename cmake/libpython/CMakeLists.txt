@@ -2,8 +2,11 @@ add_definitions(-DPy_BUILD_CORE)
 add_definitions(-DPy_BUILD_CORE_BUILTIN)
 add_definitions(-DNDEBUG)
 
-if(WITH_FREE_THREADING)
-    add_definitions(-DPy_GIL_DISABLED)
+if(PY_VERSION VERSION_GREATER_EQUAL "3.13")
+    if(WITH_MIMALLOC)
+        add_definitions(-DWITH_MIMALLOC)
+        include_directories(${SRC_DIR}/Include/internal/mimalloc)
+    endif()
 endif()
 
 set(MODULE_SOURCES # Equivalent to MODULE_OBJS in Makefile.pre
@@ -35,8 +38,12 @@ if(UNIX)
           )
     endif()
 elseif(WIN32)
-    add_definitions(-DPY3_DLLNAME="python3${CMAKE_DEBUG_POSTFIX}")
-    add_definitions(-DPYTHON_DLL_NAME="python${PY_VERSION_MAJOR}${PY_VERSION_MINOR}")
+    set(PYTHON_FEATURE_POSTFIX )
+    if(WITH_FREE_THREADING)
+        set(PYTHON_FEATURE_POSTFIX "t")
+    endif()
+    add_definitions(-DPY3_DLLNAME="python3${PYTHON_FEATURE_POSTFIX}${CMAKE_DEBUG_POSTFIX}")
+    add_definitions(-DPYTHON_DLL_NAME="python${PY_VERSION_MAJOR}${PY_VERSION_MINOR}${PYTHON_FEATURE_POSTFIX}")
     if(PY_VERSION VERSION_LESS "3.11")
         list(APPEND MODULE_SOURCES
             ${SRC_DIR}/PC/getpathp.c
@@ -244,13 +251,6 @@ if(PY_VERSION VERSION_GREATER_EQUAL "3.10")
         ${SRC_DIR}/Objects/unionobject.c
     )
 endif()
-if(PY_VERSION VERSION_GREATER_EQUAL "3.13")
-    if(WIN32)
-        # mimalloc is enabled for Windows
-        # TODO: enable this for other platforms via switches
-        include_directories(${SRC_DIR}/Include/internal/mimalloc)
-    endif()
-endif()
 
 if(CMAKE_C_COMPILER_ID MATCHES GNU)
     foreach(filename class complex float int method string type unicode weakref)
@@ -413,6 +413,7 @@ if(PY_VERSION VERSION_GREATER_EQUAL "3.12")
 endif()
 if(PY_VERSION VERSION_GREATER_EQUAL "3.13")
     list(APPEND PYTHON_COMMON_SOURCES
+        ${SRC_DIR}/Python/brc.c
         ${SRC_DIR}/Python/critical_section.c
         ${SRC_DIR}/Python/crossinterp.c
         ${SRC_DIR}/Python/gc.c
@@ -964,7 +965,7 @@ if(PY_VERSION VERSION_GREATER_EQUAL "3.11")
                 MS_DLL_ID="${ms_dll_id}"
             )
     else()
-        set(PYTHONPATH "${EXTRA_PYTHONPATH}:lib-dynload:plat-${PY_PLATFORM}:lib/python${PY_VERSION_MAJOR}.${PY_VERSION_MINOR}")
+        set(PYTHONPATH "${EXTRA_PYTHONPATH}:lib-dynload:plat-${PY_PLATFORM}:lib/python${PY_VERSION_MAJOR}.${PY_VERSION_MINOR}${ABIFLAGS}")
         if(ENABLE_TKINTER)
             set(PYTHONPATH "${PYTHONPATH}:lib-tk")
         endif()

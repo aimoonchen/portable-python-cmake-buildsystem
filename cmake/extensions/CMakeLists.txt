@@ -15,8 +15,11 @@ if(Cosmopolitan)
     set(NOT_COSMOPOLITAN 0)
 endif()
 
-if(WITH_FREE_THREADING)
-    add_definitions(-DPy_GIL_DISABLED)
+if(PY_VERSION VERSION_GREATER_EQUAL "3.13")
+    if(WITH_MIMALLOC)
+        add_definitions(-DWITH_MIMALLOC)
+        include_directories(${SRC_DIR}/Include/internal/mimalloc)
+    endif()
 endif()
 
 add_python_extension(array ${WIN32_BUILTIN} SOURCES arraymodule.c)
