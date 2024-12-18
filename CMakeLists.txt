@@ -350,6 +350,7 @@ set(_download_3.12.7_md5 "5d0c0e4c6a022a87165a9addcd869109")
 set(_download_3.12.8_md5 "304473cf367fa65e450edf4b06b55fcc")
 # 3.13.x
 set(_download_3.13.0_md5 "c29f37220520ec6075fc37d4c62e178b")
+set(_download_3.13.1_md5 "6820ac52d77af870f795dabc64583234")
 
 set(_extracted_dir "Python-${PY_VERSION}")
 
