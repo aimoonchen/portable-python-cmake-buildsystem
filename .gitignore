@@ -41,3 +41,4 @@ Python-*/
 # Ignore Python source archives
 Python-*.tgz
 Python-*.zip
+build/
