@@ -428,17 +428,17 @@ if(PY_VERSION VERSION_GREATER_EQUAL "3.13")
     )
 endif()
 
-if(UNIX)
-    list(APPEND PYTHON_COMMON_SOURCES
-        ${SRC_DIR}/Python/frozenmain.c
-    )
-else()
-    if(PY_VERSION VERSION_LESS "3.11")
-        list(APPEND PYTHON_COMMON_SOURCES
-            ${SRC_DIR}/Python/frozen.c
-        )
-    endif()
-endif()
+# if(UNIX)
+#     list(APPEND PYTHON_COMMON_SOURCES
+#         ${SRC_DIR}/Python/frozenmain.c
+#     )
+# else()
+#     if(PY_VERSION VERSION_LESS "3.11")
+#         list(APPEND PYTHON_COMMON_SOURCES
+#             ${SRC_DIR}/Python/frozen.c
+#         )
+#     endif()
+# endif()
 
 if(UNIX OR MINGW)
     set_property(
@@ -587,7 +587,7 @@ if(WIN32 AND IS_PY3)
         list(APPEND LIBPYTHON_TARGET_LIBRARIES bcrypt) # Required by bootstrap_hash
     endif()
 endif()
-
+#[[
 set(LIBPYTHON_FROZEN_SOURCES )
 set(LIBPYTHON_DEEPFREEZE_SOURCES )
 if(PY_VERSION VERSION_GREATER_EQUAL "3.11" AND PY_VERSION VERSION_LESS "3.13")
@@ -898,7 +898,7 @@ endif()
 add_custom_target(freeze_modules DEPENDS ${LIBPYTHON_FROZEN_SOURCES} ${LIBPYTHON_DEEPFREEZE_SOURCES})
 
 endif()
-
+]]
 if(PY_VERSION VERSION_LESS "3.8")
 # Build pgen executable
 set(PGEN2_SOURCES
@@ -926,7 +926,7 @@ endif()
 # Collect libpython sources
 set(LIBPYTHON_SOURCES
     ${LIBPYTHON_OMIT_FROZEN_SOURCES}
-    ${LIBPYTHON_FROZEN_SOURCES}
+    # ${LIBPYTHON_FROZEN_SOURCES}
 )
 if(PY_VERSION VERSION_GREATER_EQUAL "3.11")
     list(APPEND LIBPYTHON_SOURCES
@@ -980,10 +980,10 @@ if(PY_VERSION VERSION_GREATER_EQUAL "3.11")
                 PLATLIBDIR="lib"
         )
     endif()
-elseif(UNIX)
-    list(APPEND LIBPYTHON_SOURCES
-        ${SRC_DIR}/Python/frozen.c
-    )
+# elseif(UNIX)
+#     list(APPEND LIBPYTHON_SOURCES
+#         ${SRC_DIR}/Python/frozen.c
+#     )
 endif()
 
 # Build python libraries
@@ -1007,6 +1007,10 @@ function(add_libpython name type install component)
     set_target_properties(${name} PROPERTIES
         POSITION_INDEPENDENT_CODE ON
     )
+
+    if(CMAKE_DEBUG_POSTFIX)
+        set_target_properties(${name} PROPERTIES DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX})
+    endif()
 
     # Export target
     set_property(GLOBAL APPEND PROPERTY PYTHON_TARGETS ${name})

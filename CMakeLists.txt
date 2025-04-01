@@ -7,7 +7,7 @@ list(GET VERSION_LIST 0 PY_VERSION_MAJOR)
 list(GET VERSION_LIST 1 PY_VERSION_MINOR)
 list(GET VERSION_LIST 2 PY_VERSION_PATCH)
 set(PY_VERSION "${PY_VERSION_MAJOR}.${PY_VERSION_MINOR}.${PY_VERSION_PATCH}")
-
+set(CMAKE_DEBUG_POSTFIX "_d" CACHE STRING "Debug library postfix")
 # if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
 #     set(CMAKE_CONFIGURATION_TYPES Release CACHE STRING "Release configuration" FORCE)
 #     set(CMAKE_BUILD_TYPE Release CACHE STRING "Choose the type of build." FORCE)
@@ -78,7 +78,7 @@ if(DEFINED BUILD_SHARED OR DEFINED BUILD_STATIC)
 endif()
 
 option(BUILD_LIBPYTHON_SHARED ${_build_libpython_shared_desc} ${_build_libpython_shared_default})
-option(BUILD_EXTENSIONS_AS_BUILTIN "Default all modules as builtin to libpython" OFF)
+option(BUILD_EXTENSIONS_AS_BUILTIN "Default all modules as builtin to libpython" ON)
 option(USE_LIB64 "Search for dependencies and install to prefix/lib64 instead of prefix/lib" OFF)
 if(WIN32)
   option(INSTALL_WINDOWS_TRADITIONAL "Install the executable and extensions in the traditional location" OFF)
@@ -697,14 +697,14 @@ add_subdirectory(cmake/extensions CMakeBuild/extensions)
 
 # Add the other subdirectories
 add_subdirectory(cmake/libpython CMakeBuild/libpython)
-add_subdirectory(cmake/python CMakeBuild/python)
+# add_subdirectory(cmake/python CMakeBuild/python)
 add_subdirectory(cmake/include CMakeBuild/include)
 add_subdirectory(cmake/lib CMakeBuild/lib)
 # add_subdirectory(cmake/tools CMakeBuild/tools)
 if(BUILD_WININST)
     add_subdirectory(cmake/PC/bdist_wininst CMakeBuild/bdist_wininst)
 endif()
-
+#[[
 # Add target to run "Argument Clinic" over all source files
 if(IS_PY3)
 add_custom_target(clinic
@@ -827,7 +827,7 @@ configure_file(
     ${PROJECT_BINARY_DIR}/${_asdl_subdir}/Parser/asdl.py
     COPYONLY
 )
-
+]]
 show_extension_summary()
 
 if(UNIX)
