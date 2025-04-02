@@ -1,11 +1,4 @@
 set(files)
-
-if(PY_VERSION VERSION_GREATER_EQUAL "3.6" AND PY_VERSION VERSION_LESS "3.13")
-list(APPEND files
-  Tools/scripts/run_tests.py
-)
-endif()
-
 foreach(file IN LISTS files)
   if (EXISTS "${SRC_DIR}/${file}")
     get_filename_component(path ${file} PATH)

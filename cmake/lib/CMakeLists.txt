@@ -35,23 +35,10 @@ foreach(file ${libfiles})
     endif()
 endforeach()
 
-if(PY_VERSION VERSION_LESS "2.7.5")
-  # Setup landmark allowing to run the interpreter from a build tree. See 'getpath.c' for details.
-  file(MAKE_DIRECTORY ${BIN_BUILD_DIR}/Modules)
-  file(WRITE ${BIN_BUILD_DIR}/Modules/Setup "")
-endif()
 
 # Generate grammar tables in install directory
 # XXX Should a custom target be added to generate file at built time ?
 set(lib2to3code "")
-if(PY_VERSION VERSION_LESS "3.13")
-  set(lib2to3code "
-  execute_process(COMMAND \${wrapper} \${PYTHON_EXECUTABLE} -m lib2to3.pgen2.driver
-    \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${PYTHONHOME}/lib2to3/Grammar.txt)
-  execute_process(COMMAND \${wrapper} \${PYTHON_EXECUTABLE} -m lib2to3.pgen2.driver
-    \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${PYTHONHOME}/lib2to3/PatternGrammar.txt)
-")
-endif()
 install(CODE "find_program(
   PYTHON_EXECUTABLE python
   HINTS \$ENV{DESTDIR}\${CMAKE_INSTALL_PREFIX}/${BIN_INSTALL_DIR}

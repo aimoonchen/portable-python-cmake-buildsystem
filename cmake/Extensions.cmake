@@ -153,9 +153,7 @@ function(add_python_extension name)
     endforeach()
 
     if(BUILTIN_${upper_name})
-        if(PY_VERSION VERSION_GREATER_EQUAL "3.8")
-            list(APPEND ADD_PYTHON_EXTENSION_DEFINITIONS Py_BUILD_CORE_BUILTIN)
-        endif()
+        list(APPEND ADD_PYTHON_EXTENSION_DEFINITIONS Py_BUILD_CORE_BUILTIN)
         # This will be compiled into libpython instead of as a separate library
         set_property(GLOBAL APPEND PROPERTY builtin_extensions ${name})
         set_property(GLOBAL APPEND PROPERTY extension_${name}_sources ${absolute_sources})
@@ -169,9 +167,7 @@ function(add_python_extension name)
         add_library(${target_name} SHARED ${absolute_sources})
         target_include_directories(${target_name} PUBLIC "${ADD_PYTHON_EXTENSION_INCLUDEDIRS}")
 
-        if(PY_VERSION VERSION_GREATER_EQUAL "3.8")
-            list(APPEND ADD_PYTHON_EXTENSION_DEFINITIONS Py_BUILD_CORE_MODULE)
-        endif()
+        list(APPEND ADD_PYTHON_EXTENSION_DEFINITIONS Py_BUILD_CORE_MODULE)
 
         if(WIN32)
             string(REGEX MATCH "Py_LIMITED_API" require_limited_api "${ADD_PYTHON_EXTENSION_DEFINITIONS}")

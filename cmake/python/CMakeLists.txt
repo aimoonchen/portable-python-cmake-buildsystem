@@ -59,14 +59,12 @@ if(WIN32)
         )
 endif()
 
-if(UNIX AND PY_VERSION VERSION_GREATER "2.7.4")
+if(UNIX)
     # Setup landmark allowing to run the interpreter from a build tree. See 'getpath.c' for details.
     set(_sysconfigdata_py "_sysconfigdata.py")
-    if("${PY_VERSION}" VERSION_GREATER_EQUAL "3.6.0")
-        # XXX Add support for _PYTHON_SYSCONFIGDATA_NAME env. variable
-        set(MULTIARCH "")
-        set(_sysconfigdata_py "_sysconfigdata_${ABIFLAGS}_${PY_PLATFORM}_${MULTIARCH}.py")
-    endif()
+    # XXX Add support for _PYTHON_SYSCONFIGDATA_NAME env. variable
+    set(MULTIARCH "")
+    set(_sysconfigdata_py "_sysconfigdata_${ABIFLAGS}_${PY_PLATFORM}_${MULTIARCH}.py")
     add_custom_command(
         OUTPUT ${BIN_BUILD_DIR}/pybuilddir.txt ${EXTENSION_BUILD_DIR}/${_sysconfigdata_py}
         COMMAND ${PYTHON_WRAPPER_COMMAND}
