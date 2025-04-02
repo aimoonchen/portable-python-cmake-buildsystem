@@ -158,29 +158,8 @@ list(APPEND THREAD_SOURCES
     ${SRC_DIR}/Python/thread.c
 )
 
-set(PYTHON2_COMMON_SOURCES
-    ${SRC_DIR}/Python/formatter_string.c
-    ${SRC_DIR}/Python/pystrtod.c
-)
-if(WIN32)
-    list(APPEND PYTHON2_COMMON_SOURCES
-        ${SRC_DIR}/PC/import_nt.c
-    )
-endif()
-
-set(PYTHON3_COMMON_SOURCES
-    ${SRC_DIR}/Python/dynamic_annotations.c
-    ${SRC_DIR}/Python/fileutils.c
-    ${SRC_DIR}/Python/pyhash.c
-    ${SRC_DIR}/Python/pylifecycle.c
-    ${SRC_DIR}/Python/pystrhex.c
-    ${SRC_DIR}/Python/pystrtod.c
-    ${SRC_DIR}/Python/pytime.c
-)
-
 set(PYTHON_COMMON_SOURCES
     ${DYNLOAD_SOURCES}
-    ${PYTHON${PY_VERSION_MAJOR}_COMMON_SOURCES}
     ${THREAD_SOURCES}
     ${SRC_DIR}/Python/asdl.c
     ${SRC_DIR}/Python/ast.c
@@ -217,6 +196,13 @@ set(PYTHON_COMMON_SOURCES
     ${SRC_DIR}/Python/sysmodule.c
     ${SRC_DIR}/Python/traceback.c
     ${SRC_DIR}/Python/_warnings.c
+    ${SRC_DIR}/Python/dynamic_annotations.c
+    ${SRC_DIR}/Python/fileutils.c
+    ${SRC_DIR}/Python/pyhash.c
+    ${SRC_DIR}/Python/pylifecycle.c
+    ${SRC_DIR}/Python/pystrhex.c
+    ${SRC_DIR}/Python/pystrtod.c
+    ${SRC_DIR}/Python/pytime.c
 )
 list(APPEND PYTHON_COMMON_SOURCES
     ${SRC_DIR}/Python/ast_opt.c
