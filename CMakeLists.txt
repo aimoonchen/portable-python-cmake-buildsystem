@@ -290,7 +290,7 @@ endif()
 
 # Apply patches
 # option(PYTHON_APPLY_PATCHES "Apply patches" ON)
-set(PYTHON_APPLY_PATCHES OFF)
+set(PYTHON_APPLY_PATCHES ON)
 if(PYTHON_APPLY_PATCHES)
   include(cmake/PythonApplyPatches.cmake)
 endif()
