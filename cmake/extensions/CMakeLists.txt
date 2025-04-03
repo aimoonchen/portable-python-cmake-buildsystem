@@ -712,33 +712,33 @@ endif()
 #     INCLUDEDIRS ${LZMA_INCLUDE_PATH}
 #     LIBRARIES ${LZMA_LIBRARY}
 # )
-add_python_extension(readline
-    REQUIRES READLINE_INCLUDE_PATH READLINE_LIBRARY CURSES_LIBRARIES HAVE_READLINE_READLINE_H
-    SOURCES readline.c
-    LIBRARIES ${READLINE_LIBRARY} ${CURSES_LIBRARIES}
-    INCLUDEDIRS ${READLINE_INCLUDE_PATH}
-)
-set(sqlite3_sources
-    _sqlite/connection.c
-    _sqlite/cursor.c
-    _sqlite/microprotocols.c
-    _sqlite/module.c
-    _sqlite/prepare_protocol.c
-    _sqlite/row.c
-    _sqlite/statement.c
-    _sqlite/util.c
-)
-list(APPEND sqlite3_sources _sqlite/blob.c)
-add_python_extension(_sqlite3
-    REQUIRES SQLite3_INCLUDE_DIRS SQLite3_LIBRARIES
-    SOURCES ${sqlite3_sources}
-    DEFINITIONS MODULE_NAME="sqlite3" SQLITE_OMIT_LOAD_EXTENSION=1
-    INCLUDEDIRS ${SQLite3_INCLUDE_DIRS}
-    LIBRARIES ${SQLite3_LIBRARIES}
-)
-if(ENABLE_SQLITE3 AND CMAKE_C_COMPILER_ID MATCHES GNU)
-    set_property(SOURCE ${SRC_DIR}/Modules/_sqlite/module.c PROPERTY COMPILE_FLAGS -Wno-deprecated-declarations)
-endif()
+# add_python_extension(readline
+#     REQUIRES READLINE_INCLUDE_PATH READLINE_LIBRARY CURSES_LIBRARIES HAVE_READLINE_READLINE_H
+#     SOURCES readline.c
+#     LIBRARIES ${READLINE_LIBRARY} ${CURSES_LIBRARIES}
+#     INCLUDEDIRS ${READLINE_INCLUDE_PATH}
+# )
+# set(sqlite3_sources
+#     _sqlite/connection.c
+#     _sqlite/cursor.c
+#     _sqlite/microprotocols.c
+#     _sqlite/module.c
+#     _sqlite/prepare_protocol.c
+#     _sqlite/row.c
+#     _sqlite/statement.c
+#     _sqlite/util.c
+# )
+# list(APPEND sqlite3_sources _sqlite/blob.c)
+# add_python_extension(_sqlite3
+#     REQUIRES SQLite3_INCLUDE_DIRS SQLite3_LIBRARIES
+#     SOURCES ${sqlite3_sources}
+#     DEFINITIONS MODULE_NAME="sqlite3" SQLITE_OMIT_LOAD_EXTENSION=1
+#     INCLUDEDIRS ${SQLite3_INCLUDE_DIRS}
+#     LIBRARIES ${SQLite3_LIBRARIES}
+# )
+# if(ENABLE_SQLITE3 AND CMAKE_C_COMPILER_ID MATCHES GNU)
+#     set_property(SOURCE ${SRC_DIR}/Modules/_sqlite/module.c PROPERTY COMPILE_FLAGS -Wno-deprecated-declarations)
+# endif()
 set(_ssl_LIBRARIES ${OPENSSL_LIBRARIES})
 if(WIN32)
     list(APPEND _ssl_LIBRARIES Crypt32 ws2_32)

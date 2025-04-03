@@ -290,7 +290,7 @@ endif()
 
 # Apply patches
 # option(PYTHON_APPLY_PATCHES "Apply patches" ON)
-set(PYTHON_APPLY_PATCHES ON)
+set(PYTHON_APPLY_PATCHES OFF)
 if(PYTHON_APPLY_PATCHES)
   include(cmake/PythonApplyPatches.cmake)
 endif()
@@ -304,11 +304,11 @@ find_package(Python3 COMPONENTS Interpreter)
 
 # Options depending of the python version
 if(DEFINED USE_SYSTEM_DB)
-message(AUTHOR_WARNING "USE_SYSTEM_DB option is *NOT* supported with Python 3. Current version is ${PY_VERSION}")
+    message(AUTHOR_WARNING "USE_SYSTEM_DB option is *NOT* supported with Python 3. Current version is ${PY_VERSION}")
 endif()
 
 if(DEFINED Py_USING_UNICODE)
-message(AUTHOR_WARNING "Py_USING_UNICODE option is *NOT* supported with Python 3. Current version is ${PY_VERSION}")
+    message(AUTHOR_WARNING "Py_USING_UNICODE option is *NOT* supported with Python 3. Current version is ${PY_VERSION}")
 endif()
 
 # option(WITH_C_LOCALE_COERCION "Enable C locale coercion to a UTF-8 based locale" ON)
