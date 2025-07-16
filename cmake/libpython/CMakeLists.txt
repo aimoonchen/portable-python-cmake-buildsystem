@@ -377,7 +377,7 @@ if(WIN32)
     list(APPEND LIBPYTHON_TARGET_LIBRARIES pathcch)
     list(APPEND LIBPYTHON_TARGET_LIBRARIES bcrypt) # Required by bootstrap_hash
 endif()
-#[[
+
 set(LIBPYTHON_FROZEN_SOURCES )
 set(LIBPYTHON_DEEPFREEZE_SOURCES )
 
@@ -593,7 +593,6 @@ add_custom_command(
 # This is a convenience target allowing to regenerate
 # the frozen sources.
 add_custom_target(freeze_modules DEPENDS ${LIBPYTHON_FROZEN_SOURCES} ${LIBPYTHON_DEEPFREEZE_SOURCES})
-]]
 
 # Collect libpython sources
 set(LIBPYTHON_SOURCES
